@@ -3,7 +3,9 @@ package main
 import (
 	"customer-api/app"
 	"customer-api/controller"
+	"customer-api/exception"
 	"customer-api/helper"
+	"customer-api/middleware"
 	"customer-api/repository"
 	"customer-api/service"
 	"net/http"
@@ -29,9 +31,11 @@ func main() {
 	router.PUT("/api/categories/:categoryId", categoryController.Update)
 	router.DELETE("/api/categories/:categoryId", categoryController.Delete)
 
+	router.PanicHandler = exception.ErrorHandler
+
 	server := http.Server{
 		Addr:    "localhost:3000",
-		Handler: router,
+		Handler: middleware.NewAuthMiddleware(router),
 	}
 
 	err := server.ListenAndServe()
